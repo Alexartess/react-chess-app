@@ -25,10 +25,12 @@ const Timer: FC<TimerProps> = ({currentPlayer, restart}) => {
     //каждую секунду уменьшаем таймер
     const callback = currentPlayer?.color === Colors.WHITE ? decrementWhiteTimer : decrementBlackTimer
     timer.current = setInterval(callback, 1000)
+    console.log(blackTime)
   }
 
   function decrementBlackTimer() {
     setBlackTime(prev => prev - 1)
+   
   }
   function decrementWhiteTimer() {
     setWhiteTime(prev => prev - 1)
