@@ -62,8 +62,8 @@ export class Board{
 
     private addPawns(){
         for (let i =0; i<8; i++) {
-            new Pawn(Colors.BLACK, this.getCell(i, 1))
-            new Pawn(Colors.WHITE, this.getCell(i, 6))
+           new Pawn(Colors.BLACK, this.getCell(i, 1))
+           new Pawn(Colors.WHITE, this.getCell(i, 6))
             
         }
     }
@@ -143,26 +143,26 @@ export class Board{
         console.log("isCheckmate method is called")
         if (!this.isKingUnderAttack(color)) return false;
 
-        // Check if any move can get the king out of check
+        //check if any move can get the king out of check
         for (let row of this.cells) {
             for (let cell of row) {
                 if (cell.figure?.color === color) {
                     for (let targetRow of this.cells) {
                         for (let targetCell of targetRow) {
                             if (cell.figure.canMove(targetCell)) {
-                                // Try the move
+                                //проверяем ход на модели
                                 const originalFigure = targetCell.figure;
                                 targetCell.figure = cell.figure;
                                 cell.figure = null;
                                 
                                 const stillInCheck = this.isKingUnderAttack(color);
                                 
-                                // Undo the move
+                                //возвращаем назад
                                 cell.figure = targetCell.figure;
                                 targetCell.figure = originalFigure;
                                 
-                                if (!stillInCheck) {
-                                    return false; // Found a move that gets out of check
+                                if (!stillInCheck) { //король может спастись
+                                    return false; 
                                 }
                             }
                         }
@@ -170,7 +170,7 @@ export class Board{
                 }
             }
         }
-        return true; // No moves get out of check
+        return true; //король не может спастись
     }
 
 }

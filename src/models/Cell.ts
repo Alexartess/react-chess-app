@@ -1,6 +1,7 @@
 import { Figure } from "./figures/Figure";
 import { Colors } from "./Colors";
 import { Board } from "./Board";
+import { FigureNames } from "./figures/Figure";
 export class Cell{
     readonly x: number;
     readonly y: number;
@@ -96,15 +97,31 @@ export class Cell{
         this.board.lostBlackFigures.push(figure)
         : this.board.lostWhiteFigures.push(figure)
     }
-    moveFigure(target: Cell){
-        if(this.figure && this.figure?.canMove(target)){
-           // console.log("can move")
-            this.figure.moveFigure(target)
-            if(target.figure){
-                this.addLostFigure(target.figure);
-            }
-            target.setFigure(this.figure);
-            this.figure=null;
+    // moveFigure(target: Cell){
+    //     if(this.figure && this.figure?.canMove(target)){
+    //        // console.log("can move")
+    //         this.figure.moveFigure(target)
+    //         if(target.figure){
+    //             this.addLostFigure(target.figure);
+    //         }
+    //         target.setFigure(this.figure);
+    //         this.figure=null;
+    //     }
+    // }
+
+    moveFigure(target: Cell): boolean {  // Change return type to boolean
+    if(this.figure && this.figure?.canMove(target)){
+        const wasKing = target.figure?.name === FigureNames.KING;
+        
+        this.figure.moveFigure(target);
+        if(target.figure){
+            this.addLostFigure(target.figure);
         }
+        target.setFigure(this.figure);
+        this.figure = null;
+        
+        return wasKing;  // Return whether a king was captured
     }
+    return false;
+}
 }

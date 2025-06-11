@@ -21,27 +21,26 @@ const BoardComponent: FC<BoardProps> =({board, setBoard, currentPlayer, swapPlay
     function click(cell: Cell){
         if (gameOver.winner) return; //возврат из функции если игра уже закончена
 
-        if(selectedCell && selectedCell!==cell && selectedCell.figure?.canMove(cell)){
-            // selectedCell.moveFigure(cell);
-            // swapPlayer();
-            // setSelectedCell(null);
-
-            selectedCell.moveFigure(cell);
-            
-            // Check for checkmate
-            const opponentColor = currentPlayer?.color === Colors.WHITE ? Colors.BLACK : Colors.WHITE;
-            if (board.isCheckmate(opponentColor)) {
-                console.log("isCheckmate retutned true")
+        if (selectedCell && selectedCell !== cell && selectedCell.figure?.canMove(cell)) {
+        const kingCaptured = selectedCell.moveFigure(cell);
+        
+            if (kingCaptured) {
                 setGameOver({winner: currentPlayer?.color || null});
-            } else {
-                 console.log("isCheckmate retutned false")
-                swapPlayer();
+            } 
+            else {
+                const opponentColor = currentPlayer?.color === Colors.WHITE ? Colors.BLACK : Colors.WHITE;
+                if (board.isCheckmate(opponentColor)) {
+                    setGameOver({winner: currentPlayer?.color || null});
+                } else {
+                    swapPlayer();
+                }
             }
             
             setSelectedCell(null);
-        } else{
-            if(cell.figure?.color===currentPlayer?.color) //can't select enemy figure
-                setSelectedCell(cell)
+        } else {
+            if (cell.figure?.color === currentPlayer?.color) {
+                setSelectedCell(cell);
+            }
         }
        
     }   
