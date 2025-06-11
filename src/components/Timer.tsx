@@ -12,6 +12,8 @@ const Timer: FC<TimerProps> = ({currentPlayer, restart}) => {
   const [blackTime, setBlackTime] = useState(300)
   const [whiteTime, setWhiteTime] = useState(300)
   const timer = useRef<null | ReturnType<typeof setInterval>>(null)
+  const [gameOver, setGameOver] = useState(false);
+  const [loser, setLoser] = useState<Colors | null>(null);
 
   useEffect(() => {  //стартуем таймер при каждой смене игрока
     startTimer()
@@ -22,6 +24,9 @@ const Timer: FC<TimerProps> = ({currentPlayer, restart}) => {
       clearInterval(timer.current) //обнуляем счетчик после хода игрока
     }
 
+    // Don't start timer if game is over
+    if (gameOver) return;
+
     //каждую секунду уменьшаем таймер
     const callback = currentPlayer?.color === Colors.WHITE ? decrementWhiteTimer : decrementBlackTimer
     timer.current = setInterval(callback, 1000)
@@ -29,16 +34,36 @@ const Timer: FC<TimerProps> = ({currentPlayer, restart}) => {
   }
 
   function decrementBlackTimer() {
-    setBlackTime(prev => prev - 1)
+   //проверяем достиг ли таймер нуля
+    setBlackTime(prev => {
+      if (prev <= 1) {
+        clearInterval(timer.current!);
+        setGameOver(true);
+        setLoser(Colors.BLACK);
+        return 0;
+      }
+      return prev - 1;
+    });
    
   }
   function decrementWhiteTimer() {
-    setWhiteTime(prev => prev - 1)
+    
+    setWhiteTime(prev => {
+      if (prev <= 1) {
+        clearInterval(timer.current!);
+        setGameOver(true);
+        setLoser(Colors.WHITE);
+        return 0;
+      }
+      return prev - 1;
+    });
   }
 
   const handleRestart = () => {
     setWhiteTime(300)
     setBlackTime(300)
+    setGameOver(false);
+    setLoser(null);
     restart()
   }
 
@@ -49,6 +74,11 @@ const Timer: FC<TimerProps> = ({currentPlayer, restart}) => {
       </div>
       <h2>Черные - {blackTime}</h2>
       <h2>Белые - {whiteTime}</h2>
+      {gameOver && (
+        <h2>
+          {loser === Colors.WHITE ? 'Белый' : 'Черный'} игрок проиграл!
+        </h2>
+      )}
     </div>
   );
 };
