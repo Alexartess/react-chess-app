@@ -8,6 +8,7 @@ import { Bishop } from "./figures/Bishop"
 import { Rook } from "./figures/Rook"
 import { Knight } from "./figures/Knight"
 import { Figure } from "./figures/Figure"
+import { FigureNames } from "./figures/Figure"
 
 
 export class Board{
@@ -109,4 +110,67 @@ export class Board{
     public getCell(x: number, y: number){
         return this.cells[y][x];
     }
+
+
+    findKingCell(color: Colors): Cell | null {
+        for (let row of this.cells) {
+            for (let cell of row) {
+                if (cell.figure?.name === FigureNames.KING && cell.figure.color === color) {
+                    return cell;
+                }
+            }
+        }
+        return null;
+    }
+
+    isKingUnderAttack(color: Colors): boolean {
+        //находим в какой клетке король
+        const kingCell = this.findKingCell(color);
+        if (!kingCell) return false;
+
+        //проверяем может ли фигура походить на клетку с королем
+        for (let row of this.cells) {
+            for (let cell of row) {
+                if (cell.figure && cell.figure.color !== color && cell.figure.canMove(kingCell)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    isCheckmate(color: Colors): boolean{
+        console.log("isCheckmate method is called")
+        if (!this.isKingUnderAttack(color)) return false;
+
+        // Check if any move can get the king out of check
+        for (let row of this.cells) {
+            for (let cell of row) {
+                if (cell.figure?.color === color) {
+                    for (let targetRow of this.cells) {
+                        for (let targetCell of targetRow) {
+                            if (cell.figure.canMove(targetCell)) {
+                                // Try the move
+                                const originalFigure = targetCell.figure;
+                                targetCell.figure = cell.figure;
+                                cell.figure = null;
+                                
+                                const stillInCheck = this.isKingUnderAttack(color);
+                                
+                                // Undo the move
+                                cell.figure = targetCell.figure;
+                                targetCell.figure = originalFigure;
+                                
+                                if (!stillInCheck) {
+                                    return false; // Found a move that gets out of check
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true; // No moves get out of check
+    }
+
 }

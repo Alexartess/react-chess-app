@@ -25,6 +25,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: box-shadow 0.3s ease;
 }
 .cell img {
     width: 48px;
@@ -53,4 +54,17 @@
     padding: 30px;
     margin-left: 50px;
     background-color: lightgray;
+}
+
+.game-over {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 100;
+    text-align: center;
 }

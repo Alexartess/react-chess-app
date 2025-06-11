@@ -16,11 +16,28 @@ interface BoardProps{
 
 const BoardComponent: FC<BoardProps> =({board, setBoard, currentPlayer, swapPlayer}) =>{
     const [selectedCell, setSelectedCell] = useState<Cell | null>(null) //указываем какой тип будет в этом состоянии (cell или null)
+    const [gameOver, setGameOver] = useState<{winner: Colors | null}>({winner: null});
 
     function click(cell: Cell){
+        if (gameOver.winner) return; //возврат из функции если игра уже закончена
+
         if(selectedCell && selectedCell!==cell && selectedCell.figure?.canMove(cell)){
+            // selectedCell.moveFigure(cell);
+            // swapPlayer();
+            // setSelectedCell(null);
+
             selectedCell.moveFigure(cell);
-            swapPlayer();
+            
+            // Check for checkmate
+            const opponentColor = currentPlayer?.color === Colors.WHITE ? Colors.BLACK : Colors.WHITE;
+            if (board.isCheckmate(opponentColor)) {
+                console.log("isCheckmate retutned true")
+                setGameOver({winner: currentPlayer?.color || null});
+            } else {
+                 console.log("isCheckmate retutned false")
+                swapPlayer();
+            }
+            
             setSelectedCell(null);
         } else{
             if(cell.figure?.color===currentPlayer?.color) //can't select enemy figure
@@ -30,15 +47,35 @@ const BoardComponent: FC<BoardProps> =({board, setBoard, currentPlayer, swapPlay
     }   
 
     //на любое изменение выбранной ячейки вызываем highlight
-    useEffect(() =>{
-        highlightCells()
-    }, [selectedCell])
+    // useEffect(() =>{
+    //     highlightCells()
+    // }, [selectedCell])
+
+      useEffect(() => {
+        highlightCells();
+        highlightKingUnderAttack();
+    }, [selectedCell, currentPlayer]);
 
 
     function highlightCells(){  //подсветка ячеек 
         board.highlightCells(selectedCell)
         updateBoard()
 
+    }
+
+    function highlightKingUnderAttack() {
+        console.log("highlight king under attack is called")
+        // Reset all attack highlights
+        board.cells.forEach(row => row.forEach(cell => cell.underAttack = false));
+        
+        // Highlight if king is under attack
+        const currentOpponentColor = currentPlayer?.color === Colors.WHITE ? Colors.BLACK : Colors.WHITE;
+        if (board.isKingUnderAttack(currentOpponentColor)) {
+            const kingCell = board.findKingCell(currentOpponentColor);
+            if (kingCell) kingCell.underAttack = true;
+        }
+        
+        updateBoard();
     }
 
     //функция для перерендеринга компонента
@@ -50,6 +87,11 @@ const BoardComponent: FC<BoardProps> =({board, setBoard, currentPlayer, swapPlay
     return(
         <div>
             <h3>Текущий игрок: {currentPlayer?.color===Colors.BLACK? "Черный" : "Белый"}</h3>
+            {gameOver.winner && (
+            <div className="game-over">
+                <h2>Игра окончена! Победитель: {gameOver.winner===Colors.BLACK? "Черные" : "Белые"}</h2>
+            </div>
+            )}
             <div className="board">
             
             {board.cells.map((row, index) =>

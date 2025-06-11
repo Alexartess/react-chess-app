@@ -9,6 +9,7 @@ export class Cell{
     board: Board;
     available: boolean;
     id: number;
+    underAttack: boolean = false;
 
     constructor(board: Board, x: number, y: number, color: Colors, figure: Figure|null){
         this.x=x;
