@@ -11,12 +11,19 @@ interface BoardProps{
     setBoard: (board: Board) => void;
     currentPlayer: Player | null;
     swapPlayer: () => void;
+    restart: () => void;
 }
 
 
-const BoardComponent: FC<BoardProps> =({board, setBoard, currentPlayer, swapPlayer}) =>{
+const BoardComponent: FC<BoardProps> =({board, setBoard, currentPlayer, swapPlayer, restart}) =>{
     const [selectedCell, setSelectedCell] = useState<Cell | null>(null) //указываем какой тип будет в этом состоянии (cell или null)
     const [gameOver, setGameOver] = useState<{winner: Colors | null}>({winner: null});
+
+    const handleRestart = () => {
+        setGameOver({winner: null});
+        restart(); 
+        setSelectedCell(null);
+    }
 
     function click(cell: Cell){
         if (gameOver.winner) return; //возврат из функции если игра уже закончена
@@ -85,12 +92,19 @@ const BoardComponent: FC<BoardProps> =({board, setBoard, currentPlayer, swapPlay
 
     return(
         <div>
-            <h3>Текущий игрок: {currentPlayer?.color===Colors.BLACK? "Черный" : "Белый"}</h3>
+            <h3>Текущий ход: {currentPlayer?.color===Colors.BLACK? "Черные" : "Белые"}</h3>
+            
             {gameOver.winner && (
             <div className="game-over">
-                <h2>Игра окончена! Победитель: {gameOver.winner===Colors.BLACK? "Черные" : "Белые"}</h2>
+                <div className="game-over-content">
+                        <h2>Игра окончена!</h2>
+                        <p>Победитель: {gameOver.winner === Colors.BLACK ? "Черные" : "Белые"}</p>
+                        <button onClick={handleRestart}>Начать заново</button> 
+                </div>
+                
             </div>
             )}
+
             <div className="board">
             
             {board.cells.map((row, index) =>

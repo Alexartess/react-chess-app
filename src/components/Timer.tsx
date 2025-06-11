@@ -75,10 +75,16 @@ const Timer: FC<TimerProps> = ({currentPlayer, restart}) => {
       <h2>Черные - {blackTime}</h2>
       <h2>Белые - {whiteTime}</h2>
       {gameOver && (
-        <h2>
-          {loser === Colors.WHITE ? 'Белый' : 'Черный'} игрок проиграл!
-        </h2>
-      )}
+                  <div className="game-over">
+                      <div className="game-over-content">
+                              <h2>Игра окончена!</h2>
+                              <p>Победитель: {loser === Colors.WHITE ? 'Черные' : 'Белые'}</p>
+                              <button onClick={handleRestart}>Начать заново</button> 
+                      </div>
+                      
+                  </div>
+                  )}
+      
     </div>
   );
 };

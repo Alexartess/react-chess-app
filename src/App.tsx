@@ -18,7 +18,7 @@ function App() {
 
   useEffect(()=>{
     restart();
-    setCurrentPlayer(whitePlayer)
+    //setCurrentPlayer(whitePlayer)
   }, [])
 
   function restart(){
@@ -26,6 +26,7 @@ function App() {
     newBoard.initCells();
     newBoard.addFigures();
     setBoard(newBoard);
+    setCurrentPlayer(whitePlayer)
   }
 
   function swapPlayer(){
@@ -36,7 +37,7 @@ function App() {
     <div className="app">
      
      <Timer restart={restart} currentPlayer={currentPlayer}/>
-     <BoardComponent board = {board} setBoard={setBoard} currentPlayer = {currentPlayer} swapPlayer = {swapPlayer}/>
+     <BoardComponent board = {board} setBoard={setBoard} currentPlayer = {currentPlayer} swapPlayer = {swapPlayer} restart={restart}/>
      <div>
         <LostFigures title={"Черные фигуры"} figures={board.lostBlackFigures}/>
      </div>
