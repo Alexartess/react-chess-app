@@ -34,6 +34,8 @@ const Timer: FC<TimerProps> = ({currentPlayer, restart}) => {
   }
 
   function decrementBlackTimer() {
+    if (gameOver) return;
+
    //проверяем достиг ли таймер нуля
     setBlackTime(prev => {
       if (prev <= 1) {
@@ -47,7 +49,8 @@ const Timer: FC<TimerProps> = ({currentPlayer, restart}) => {
    
   }
   function decrementWhiteTimer() {
-    
+    if (gameOver) return;
+
     setWhiteTime(prev => {
       if (prev <= 1) {
         clearInterval(timer.current!);

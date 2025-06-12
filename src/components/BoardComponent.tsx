@@ -5,6 +5,7 @@ import CellComponent from "./CellComponent";
 import { Cell } from "../models/Cell";
 import { Player } from "../models/Player";
 import { Colors } from "../models/Colors";
+import { MoveHistory } from "../models/MoveHistory";
 
 interface BoardProps{
     board: Board;
@@ -12,10 +13,11 @@ interface BoardProps{
     currentPlayer: Player | null;
     swapPlayer: () => void;
     restart: () => void;
+    moveHistory: MoveHistory;
 }
 
 
-const BoardComponent: FC<BoardProps> =({board, setBoard, currentPlayer, swapPlayer, restart}) =>{
+const BoardComponent: FC<BoardProps> =({board, setBoard, currentPlayer, swapPlayer, restart, moveHistory}) =>{
     const [selectedCell, setSelectedCell] = useState<Cell | null>(null) //указываем какой тип будет в этом состоянии (cell или null)
     const [gameOver, setGameOver] = useState<{winner: Colors | null}>({winner: null});
 
@@ -29,7 +31,19 @@ const BoardComponent: FC<BoardProps> =({board, setBoard, currentPlayer, swapPlay
         if (gameOver.winner) return; //возврат из функции если игра уже закончена
 
         if (selectedCell && selectedCell !== cell && selectedCell.figure?.canMove(cell)) {
-        const kingCaptured = selectedCell.moveFigure(cell);
+
+            if (selectedCell.figure) {
+                const from = `${String.fromCharCode(97 + selectedCell.x)}${8 - selectedCell.y}`;
+                const to = `${String.fromCharCode(97 + cell.x)}${8 - cell.y}`;
+                moveHistory.addMove(
+                    currentPlayer?.color || Colors.WHITE,
+                    selectedCell.figure.name,
+                    from,
+                    to
+                );
+            }
+
+            const kingCaptured = selectedCell.moveFigure(cell);
         
             if (kingCaptured) {
                 setGameOver({winner: currentPlayer?.color || null});
