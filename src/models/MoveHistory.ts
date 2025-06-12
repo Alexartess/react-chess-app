@@ -29,4 +29,13 @@ export class MoveHistory {
     clear() {
         this.moves = [];
     }
+
+
+    serialize(): Move[] {
+        return this.moves;
+    }
+
+    deserialize(moves: Move[]) {
+        this.moves = moves;
+    }
 }

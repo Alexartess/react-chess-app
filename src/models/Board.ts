@@ -9,6 +9,7 @@ import { Rook } from "./figures/Rook"
 import { Knight } from "./figures/Knight"
 import { Figure } from "./figures/Figure"
 import { FigureNames } from "./figures/Figure"
+import { SerializedFigure } from "./GameState"
 
 
 export class Board{
@@ -100,6 +101,7 @@ export class Board{
     }
 
     public addFigures(){
+        //console.log("adding figures");
       this.addBishops();
       this.addKings();
       this.addKnights();
@@ -172,5 +174,69 @@ export class Board{
         }
         return true; //король не может спастись
     }
+
+
+    //serialization for local storage
+    serialize(): SerializedFigure[] {
+        const figures: SerializedFigure[] = [];
+        this.cells.forEach(row => {
+            row.forEach(cell => {
+                if (cell.figure) {
+                    figures.push({
+                        color: cell.figure.color,
+                        name: cell.figure.name,
+                        x: cell.x,
+                        y: cell.y
+                    });
+                }
+            });
+        });
+        return figures;
+    }
+
+
+
+    deserialize(figures: SerializedFigure[]): Board {
+    const newBoard = this;
+    newBoard.initCells();
+    console.log(figures);
+    const cellsWithFigures = figures.map(fig => {
+        const cell = newBoard.getCell(fig.x, fig.y);
+        if (!cell) return null;
+        
+        let figure: Figure;
+        switch(fig.name) {
+            // ... same switch cases as before ...
+                    case FigureNames.KING:
+                        figure = new King(fig.color, cell);
+                        break;
+                    case FigureNames.QUEEN:
+                        figure = new Queen(fig.color, cell);
+                        break;
+                    case FigureNames.BISHOP:
+                        figure = new Bishop(fig.color, cell);
+                        break;
+                    case FigureNames.KNIGHT:
+                        figure = new Knight(fig.color, cell);
+                        break;
+                    case FigureNames.ROOK:
+                        figure = new Rook(fig.color, cell);
+                        break;
+                    default:
+                        figure = new Pawn(fig.color, cell);
+        }
+        
+        return { cell, figure };
+    }).filter((item): item is { cell: Cell; figure: Figure } => item !== null) ;
+    console.log(cellsWithFigures);
+    cellsWithFigures.forEach(({ cell, figure }) => {
+        if (cell && figure) {
+            cell.setFigure(figure);
+        }
+    });
+   
+    
+    return newBoard;
+}
 
 }
