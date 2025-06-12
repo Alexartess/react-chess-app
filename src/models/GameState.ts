@@ -11,9 +11,16 @@ export interface SerializedFigure {
     y: number;
 }
 
+export interface SerializedLostFigure {
+    color: Colors;
+    name: FigureNames;
+}
+
 export interface GameState {
     board: SerializedFigure[];
     moves: Move[];
     currentPlayer: Player | null;
+    lostBlackFigures: SerializedLostFigure[];
+    lostWhiteFigures: SerializedLostFigure[];
    
 }

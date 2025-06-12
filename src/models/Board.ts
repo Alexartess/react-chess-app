@@ -9,7 +9,7 @@ import { Rook } from "./figures/Rook"
 import { Knight } from "./figures/Knight"
 import { Figure } from "./figures/Figure"
 import { FigureNames } from "./figures/Figure"
-import { SerializedFigure } from "./GameState"
+import { SerializedFigure, SerializedLostFigure } from "./GameState"
 
 
 export class Board{
@@ -177,12 +177,30 @@ export class Board{
 
 
     //serialization for local storage
-    serialize(): SerializedFigure[] {
-        const figures: SerializedFigure[] = [];
+    // serialize(): SerializedFigure[] {
+    //     const figures: SerializedFigure[] = [];
+    //     this.cells.forEach(row => {
+    //         row.forEach(cell => {
+    //             if (cell.figure) {
+    //                 figures.push({
+    //                     color: cell.figure.color,
+    //                     name: cell.figure.name,
+    //                     x: cell.x,
+    //                     y: cell.y
+    //                 });
+    //             }
+    //         });
+    //     });
+    //     return figures;
+    // }
+
+    // In Board.ts
+    serialize(): { board: SerializedFigure[], lostBlack: SerializedLostFigure[], lostWhite: SerializedLostFigure[] } {
+        const boardFigures: SerializedFigure[] = [];
         this.cells.forEach(row => {
             row.forEach(cell => {
                 if (cell.figure) {
-                    figures.push({
+                    boardFigures.push({
                         color: cell.figure.color,
                         name: cell.figure.name,
                         x: cell.x,
@@ -191,16 +209,31 @@ export class Board{
                 }
             });
         });
-        return figures;
+
+        const lostBlack = this.lostBlackFigures.map(fig => ({
+            color: fig.color,
+            name: fig.name
+        }));
+
+        const lostWhite = this.lostWhiteFigures.map(fig => ({
+            color: fig.color,
+            name: fig.name
+        }));
+
+        return {
+            board: boardFigures,
+            lostBlack,
+            lostWhite
+        };
     }
 
 
 
-    deserialize(figures: SerializedFigure[]): Board {
+    deserialize(data: { figures: SerializedFigure[], lostBlack: SerializedLostFigure[], lostWhite: SerializedLostFigure[] }): Board {
     const newBoard = this;
     newBoard.initCells();
-    console.log(figures);
-    const cellsWithFigures = figures.map(fig => {
+    console.log(data.figures);
+    const cellsWithFigures = data.figures.map(fig => {
         const cell = newBoard.getCell(fig.x, fig.y);
         if (!cell) return null;
         
@@ -235,7 +268,59 @@ export class Board{
         }
     });
    
-    
+     // Restore lost figures
+    newBoard.lostBlackFigures = data.lostBlack.map(fig => {
+        const dummyCell = new Cell(newBoard, 0, 0, Colors.BLACK, null);
+        let figure: Figure;
+        switch(fig.name) {
+            case FigureNames.KING:
+                figure = new King(fig.color, dummyCell);
+                break;
+            case FigureNames.QUEEN:
+                figure = new Queen(fig.color, dummyCell);
+                break;
+            case FigureNames.KNIGHT:
+                figure = new Knight(fig.color, dummyCell);
+                break;
+            case FigureNames.BISHOP:
+                figure = new Bishop(fig.color, dummyCell);
+                break;
+            case FigureNames.ROOK:
+                figure = new Rook(fig.color, dummyCell);
+                break;
+            
+            default:
+                figure = new Pawn(fig.color, dummyCell);
+        }
+        return figure;
+    });
+
+    newBoard.lostWhiteFigures = data.lostWhite.map(fig => {
+        const dummyCell = new Cell(newBoard, 0, 0, Colors.WHITE, null);
+        let figure: Figure;
+        switch(fig.name) {
+           case FigureNames.KING:
+                figure = new King(fig.color, dummyCell);
+                break;
+            case FigureNames.QUEEN:
+                figure = new Queen(fig.color, dummyCell);
+                break;
+            case FigureNames.KNIGHT:
+                figure = new Knight(fig.color, dummyCell);
+                break;
+            case FigureNames.BISHOP:
+                figure = new Bishop(fig.color, dummyCell);
+                break;
+            case FigureNames.ROOK:
+                figure = new Rook(fig.color, dummyCell);
+                break;
+            
+            default:
+                figure = new Pawn(fig.color, dummyCell);
+        }
+        return figure;
+    });
+
     return newBoard;
 }
 

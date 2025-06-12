@@ -26,18 +26,20 @@ function App() {
   
 
   const loadGame = (): boolean => {
-  const savedGame = StorageService.loadGame();
-  if (savedGame) {
-    console.log("Loading saved game:", savedGame);
-    const newBoard = new Board().deserialize(savedGame.board);
-    setBoard(newBoard);
-    moveHistory.deserialize(savedGame.moves);
-    setCurrentPlayer(savedGame.currentPlayer);
-    console.log("player after reload: ", currentPlayer);
-    return true;
-  }
-  return false;
-  };
+    const savedGame = StorageService.loadGame();
+    if (savedGame) {
+        const newBoard = new Board().deserialize({
+            figures: savedGame.board,
+            lostBlack: savedGame.lostBlackFigures,
+            lostWhite: savedGame.lostWhiteFigures
+        });
+        setBoard(newBoard);
+        moveHistory.deserialize(savedGame.moves);
+        setCurrentPlayer(savedGame.currentPlayer);
+        return true;
+    }
+    return false;
+};
 
   useEffect(() => {
    loadGame();
@@ -52,16 +54,18 @@ function App() {
   }, []);
 
   useEffect(() => {
-  if (!hasLoaded) return; //don't save until initial load completes!!!!
-  console.log("player before reload: ", currentPlayer);
-  const gameState: GameState = {
-    board: board.serialize(),
-    moves: moveHistory.getMoves(),
-    currentPlayer: currentPlayer,
- 
-  };
-  StorageService.saveGame(gameState);
-  }, [board, currentPlayer, moveHistory, hasLoaded]); //hasLoaded as dependency
+    if (!hasLoaded) return;
+    
+    const serialized = board.serialize();
+    const gameState: GameState = {
+        board: serialized.board,
+        moves: moveHistory.getMoves(),
+        currentPlayer: currentPlayer,
+        lostBlackFigures: serialized.lostBlack,
+        lostWhiteFigures: serialized.lostWhite
+    };
+    StorageService.saveGame(gameState);
+  }, [board, currentPlayer, moveHistory, hasLoaded]); 
 
 
 
