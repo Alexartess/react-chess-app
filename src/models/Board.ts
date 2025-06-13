@@ -239,7 +239,7 @@ export class Board{
         
         let figure: Figure;
         switch(fig.name) {
-            // ... same switch cases as before ...
+           
                     case FigureNames.KING:
                         figure = new King(fig.color, cell);
                         break;
