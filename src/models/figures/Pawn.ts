@@ -46,4 +46,6 @@ export class Pawn extends Figure {
         super.moveFigure(target);
         this.isFirstStep=false; 
     }
+
+    
 }
